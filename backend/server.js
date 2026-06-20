@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 //test7
 const {
-  DB_HOST = "10.0.9.43", // [LISTO]acá colocar la IP Privada EC2 DB
+  DB_HOST = "10.0.0.155", // [LISTO]acá colocar la IP Privada EC2 DB
   DB_USER = "alumno",
   DB_PASSWORD = "alumno123",
   DB_NAME = "tienda_perritos",
