@@ -1,0 +1,41 @@
+services:
+  tienda-db:
+    build: ./db
+    container_name: tienda-db
+    # No es necesario redeclarar las variables de entorno acá:
+    # ya vienen definidas por defecto en el Dockerfile (ENV MYSQL_ROOT_PASSWORD, etc.)
+    ports:
+      - "3306:3306"   # opcional: solo si quieres conectarte desde tu PC con un cliente MySQL
+    networks:
+      - tienda-net
+
+  tienda-backend:
+    build: ./backend
+    container_name: tienda-backend
+    environment:
+      DB_HOST: tienda-db          # nombre del servicio de arriba, no una IP
+      DB_USER: alumno
+      DB_PASSWORD: alumno123
+      DB_NAME: tienda_perritos
+      DB_PORT: 3306
+      PORT: 3001
+    depends_on:
+      - tienda-db
+    ports:
+      - "3001:3001"   # opcional: útil para probar el backend directo con curl/Postman
+    networks:
+      - tienda-net
+
+  tienda-frontend:
+    build: ./frontend
+    container_name: tienda-frontend
+    depends_on:
+      - tienda-backend
+    ports:
+      - "80:80"
+    networks:
+      - tienda-net
+
+networks:
+  tienda-net:
+    driver: bridge

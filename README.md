@@ -1,4 +1,4 @@
-# Tienda Perritos - EV3
+# Tienda Perritos - EFT DevOps
 
 ## Descripción General
 
@@ -19,77 +19,49 @@ Este proyecto fue desarrollado para aplicar conceptos relacionados con:
 
 ## Evolución del Proyecto
 
-Este proyecto corresponde a la tercera etapa de desarrollo de Tienda Perritos.
+Este proyecto corresponde a la Evaluación Final Transversal (EFT), que consolida y profundiza el trabajo desarrollado en las evaluaciones parciales anteriores.
 
 ### Evaluación 2
 
-En la Evaluación 2 se implementó una arquitectura tradicional de tres capas desplegada sobre Amazon EC2, donde cada componente se ejecutaba en una instancia independiente:
+Arquitectura tradicional de tres capas desplegada sobre Amazon EC2, donde cada componente se ejecutaba en una instancia independiente:
 
 * Capa Web (Frontend)
 * Capa Aplicación (Backend)
 * Capa Datos (MySQL)
 
-El despliegue se realizaba mediante contenedores Docker y un pipeline CI/CD basado en GitHub Actions.
+Despliegue mediante contenedores Docker y un pipeline CI/CD básico (GitHub Actions → ECR → EC2).
 
-### Evaluación 3
+### Evaluación 3 / EFT
 
-En la Evaluación 3 la solución fue modernizada mediante Kubernetes y Amazon EKS, reemplazando la administración manual de instancias EC2 por una plataforma de orquestación de contenedores capaz de proporcionar:
+La solución fue modernizada mediante Kubernetes y Amazon EKS, reemplazando la administración manual de instancias EC2 por una plataforma de orquestación de contenedores. La EFT profundiza específicamente en la automatización completa del ciclo CI/CD sobre esta arquitectura.
 
-* Escalabilidad automática.
-* Alta disponibilidad.
-* Recuperación automática ante fallas.
-* Despliegues automatizados.
-* Administración centralizada de la infraestructura.
+### Comparación entre EV2 y EV3/EFT
 
-### Comparación entre EV2 y EV3
+| Característica              | EV2 - Arquitectura 3 Capas             | EV3/EFT - Kubernetes y EKS               |
+| ---------------------------- | --------------------------------------- | ------------------------------------------ |
+| Infraestructura               | 3 instancias EC2                        | Clúster Amazon EKS (`cluster-eks`)         |
+| Despliegue                    | Contenedores Docker en EC2              | Pods administrados por Kubernetes          |
+| Orquestación                  | No disponible                           | Kubernetes                                 |
+| Registro de imágenes          | Amazon ECR                              | Amazon ECR                                 |
+| Pipeline CI/CD                | GitHub Actions → ECR → EC2              | GitHub Actions → ECR → EKS                 |
+| Escalamiento                  | Manual                                  | Automático mediante HPA                    |
+| Recuperación ante fallas      | Reinicio manual de contenedores         | Auto-Healing de Kubernetes                 |
+| Balanceo de carga             | Configuración manual                    | LoadBalancer administrado por Kubernetes   |
+| Monitoreo                     | Servicios básicos de AWS                | CloudWatch + métricas del clúster          |
+| Actualización de versiones    | Actualización de contenedores en EC2    | Rollout automático de Deployments          |
 
-| Característica             | EV2 - Arquitectura 3 Capas                           | EV3 - Kubernetes y EKS                            |
-| -------------------------- | ---------------------------------------------------- | ------------------------------------------------- |
-| Infraestructura            | 3 instancias EC2 (Frontend, Backend y Base de Datos) | Clúster Amazon EKS                                |
-| Despliegue                 | Contenedores Docker ejecutados en EC2                | Pods administrados por Kubernetes                 |
-| Orquestación               | No disponible                                        | Kubernetes                                        |
-| Registro de imágenes       | Amazon ECR                                           | Amazon ECR                                        |
-| Pipeline CI/CD             | GitHub Actions → ECR → EC2                           | GitHub Actions → ECR → EKS                        |
-| Escalamiento               | Manual                                               | Automático mediante HPA                           |
-| Recuperación ante fallas   | Reinicio manual de contenedores                      | Auto-Healing de Kubernetes                        |
-| Balanceo de carga          | Configuración manual                                 | LoadBalancer administrado por Kubernetes          |
-| Monitoreo                  | Servicios básicos de AWS                             | CloudWatch + métricas del clúster                 |
-| Administración             | Gestión individual de servidores                     | Administración centralizada mediante Kubernetes   |
-| Disponibilidad             | Dependiente de cada instancia EC2                    | Mayor disponibilidad mediante replicación de Pods |
-| Actualización de versiones | Actualización de contenedores en EC2                 | Rollout automático de Deployments                 |
-
-### Mejoras Incorporadas en EV3
-
-La Evaluación 3 toma como base la solución desarrollada en la Evaluación 2 y reemplaza la arquitectura tradicional de tres capas desplegada sobre Amazon EC2 por una plataforma basada en Kubernetes administrada mediante Amazon EKS.
-
-Las principales mejoras obtenidas son:
+### Mejoras Incorporadas
 
 * Escalamiento automático mediante Horizontal Pod Autoscaler (HPA).
 * Recuperación automática ante fallas (Auto-Healing).
-* Balanceo de carga mediante Services de tipo LoadBalancer.
-* Administración centralizada de contenedores.
-* Mayor disponibilidad y resiliencia de la aplicación.
-* Mejor integración con prácticas DevOps.
-* Despliegues automatizados y controlados.
-* Capacidad de crecimiento sin administrar manualmente servidores EC2.
-
----
-
-## Objetivo del Proyecto
-
-El objetivo principal es demostrar cómo una aplicación moderna puede ser desplegada y administrada utilizando tecnologías Cloud-Native, permitiendo:
-
-* Escalabilidad automática.
-* Alta disponibilidad.
-* Recuperación automática ante fallas.
-* Automatización del despliegue.
-* Monitoreo centralizado.
+* Balanceo de carga mediante Service de tipo LoadBalancer.
+* Administración centralizada de contenedores mediante un único Managed Node Group.
+* Entorno de desarrollo local reproducible mediante Docker Compose.
+* Pipeline CI/CD extendido hasta el despliegue en EKS (build → push → deploy).
 
 ---
 
 ## Funcionalidades
-
-La aplicación permite:
 
 * Consultar productos registrados.
 * Agregar nuevos productos.
@@ -100,122 +72,94 @@ La aplicación permite:
 
 ---
 
-## Arquitectura Actual de la Solución
-
-La aplicación se ejecuta sobre un clúster de Amazon EKS utilizando Kubernetes como plataforma de orquestación.
-
-Aunque la lógica del sistema continúa separada en Frontend, Backend y Base de Datos, estos componentes ya no se encuentran distribuidos en instancias EC2 independientes como en la Evaluación 2.
-
-Actualmente cada componente se ejecuta como Pods administrados por Kubernetes dentro de un clúster EKS.
-
-### Arquitectura General
+## Arquitectura de la Solución
 
 ```text
                  Internet
                      │
                      ▼
-             Load Balancer
+            Internet Gateway
                      │
                      ▼
-              Frontend Pod
+             Load Balancer (subredes públicas)
                      │
                      ▼
-              Backend Pod
-                     │
-                     ▼
-                MySQL Pod
+              Frontend Pod  ──▶  Backend Pod  ──▶  MySQL Pod
+                     (subredes privadas, mismo Managed Node Group)
 
-                 Amazon EKS
+                 Amazon EKS — cluster-eks
 ```
 
+Cada componente se ejecuta como Pods administrados por Kubernetes, distribuidos sobre un único **Managed Node Group** (`nodo-eks`, capacidad Spot, t3.large, escalado 1-3), sin nodos dedicados por componente: es Kubernetes quien decide en qué nodo del pool compartido programa cada pod.
+
 ### Capa de Presentación (Frontend)
-
-**Tecnologías utilizadas**
-
-* HTML
-* CSS
-* JavaScript
-* Nginx
-
-**Responsabilidades**
-
-* Mostrar la interfaz gráfica.
-* Permitir la interacción del usuario.
-* Consumir los servicios REST expuestos por el backend.
+**Tecnologías:** HTML, CSS, JavaScript, Nginx
+**Responsabilidades:** interfaz gráfica, interacción con el usuario, consumo de la API REST del backend vía `tienda-backend:3001`.
 
 ### Capa de Aplicación (Backend)
-
-**Tecnologías utilizadas**
-
-* Node.js
-* Express
-
-**Responsabilidades**
-
-* Implementar la lógica de negocio.
-* Validar solicitudes.
-* Gestionar operaciones CRUD.
-* Exponer endpoints REST.
+**Tecnologías:** Node.js, Express
+**Responsabilidades:** lógica de negocio, validación, operaciones CRUD, endpoints REST, conexión a MySQL vía `tienda-db:3306`.
 
 ### Capa de Datos (Base de Datos)
-
-**Tecnologías utilizadas**
-
-* MySQL
-
-**Responsabilidades**
-
-* Almacenar la información de los productos.
-* Garantizar la persistencia de los datos.
+**Tecnologías:** MySQL 8
+**Responsabilidades:** persistencia del catálogo de productos.
 
 ---
 
 ## Flujo de Funcionamiento
 
 1. El usuario accede a la aplicación web.
-2. El frontend envía solicitudes HTTP al backend.
+2. El frontend envía solicitudes HTTP al backend (`tienda-backend:3001`).
 3. El backend procesa la solicitud.
-4. El backend consulta o modifica información en MySQL.
+4. El backend consulta o modifica información en MySQL (`tienda-db:3306`).
 5. La respuesta es enviada al frontend.
 6. El usuario visualiza los resultados.
+
+La comunicación entre componentes se resuelve siempre por **nombre de servicio** (DNS interno), nunca por IP fija — tanto en desarrollo local (red de Docker Compose) como en producción (CoreDNS de Kubernetes).
 
 ---
 
 ## Infraestructura AWS
 
-La solución fue desplegada utilizando los siguientes servicios:
-
-* Amazon EKS (Elastic Kubernetes Service)
-* Amazon ECR (Elastic Container Registry)
-* Amazon VPC
-* AWS IAM
-* Elastic Load Balancer (ELB)
-* Amazon CloudWatch
+* **Amazon EKS** — clúster `cluster-eks`
+* **Amazon ECR** — repositorios `tienda-frontend`, `tienda-backend`, `tienda-db`
+* **Amazon VPC** — `10.0.0.0/20`, 2 subredes públicas + 4 privadas, distribuidas en 2 Zonas de Disponibilidad
+* **Internet Gateway** — salida/entrada de tráfico público de la VPC
+* **NAT Gateway** — uno por Zona de Disponibilidad, para tráfico saliente de los nodos en subredes privadas
+* **AWS IAM** — roles `LabEksClusterRole` y `LabEksNodeRole`
+* **Elastic Load Balancer** — expuesto vía Service tipo `LoadBalancer` (`tienda-frontend`)
+* **Amazon CloudWatch** — métricas y logs del plano de control del clúster
 
 ---
 
 ## Contenedorización con Docker
 
-Cada componente del sistema se ejecuta dentro de su propio contenedor Docker.
+Cada componente se ejecuta en su propio contenedor, con imágenes independientes:
 
-**Imágenes utilizadas**
+* `tienda-frontend`
+* `tienda-backend`
+* `tienda-db`
 
-* tienda-frontend
-* tienda-backend
-* tienda-db
+**Beneficios:** portabilidad, aislamiento, facilidad de despliegue, consistencia entre entornos.
 
-**Beneficios**
+### Desarrollo local con Docker Compose
 
-* Portabilidad.
-* Aislamiento.
-* Facilidad de despliegue.
-* Consistencia entre entornos.
+Se incluye un archivo `docker-compose.yml` en la raíz del proyecto, que levanta los tres servicios en una red interna común, replicando localmente la misma lógica de comunicación por nombre de servicio que se usa después en EKS (`tienda-backend`, `tienda-db`). Esto permite validar la integración completa del sistema antes de publicar imágenes en ECR y desplegar en el clúster.
+
+```bash
+docker compose up --build
+```
+
+Luego abrir `http://localhost` en el navegador.
 
 ---
 
 ## Kubernetes y Amazon EKS
 
-Para administrar los contenedores se utilizó Kubernetes mediante Amazon EKS.
+### Clúster y Node Group
+
+* Clúster: `cluster-eks`
+* Managed Node Group: `nodo-eks` (Spot, t3.large, mínimo 1 / deseado 1 / máximo 3)
 
 ### Namespace
 
@@ -235,8 +179,8 @@ tienda-db
 
 ```text
 tienda-frontend (LoadBalancer)
-tienda-backend (ClusterIP)
-tienda-db (ClusterIP)
+tienda-backend  (ClusterIP)
+tienda-db       (Headless Service)
 ```
 
 ### Beneficios Obtenidos
@@ -251,158 +195,126 @@ tienda-db (ClusterIP)
 
 ## Escalamiento Automático (HPA)
 
-La aplicación utiliza Horizontal Pod Autoscaler (HPA).
+| Componente | Réplicas mín. | Réplicas máx. | Umbral CPU |
+|---|---|---|---|
+| Backend  | 2 | 10 | 70% |
+| Frontend | 2 | 6  | 60% |
 
-Cuando aumenta la carga de trabajo:
-
-* Kubernetes crea nuevos Pods automáticamente.
-
-Cuando disminuye la carga:
-
-* Kubernetes reduce la cantidad de Pods para optimizar recursos.
-
-Esto permite utilizar eficientemente la infraestructura disponible.
+Cuando la utilización de CPU supera el umbral configurado, Kubernetes crea nuevos Pods automáticamente hasta el máximo definido; cuando la carga disminuye, reduce gradualmente hasta el mínimo.
 
 ---
 
 ## Auto-Healing
 
-Kubernetes monitorea continuamente los contenedores.
-
-Si un Pod falla:
-
-1. Kubernetes detecta el problema.
-2. El Deployment identifica la pérdida del Pod.
-3. ReplicaSet crea automáticamente un nuevo Pod.
-4. El servicio continúa disponible para los usuarios.
-
-Este mecanismo mejora la disponibilidad y resiliencia de la aplicación.
+Si un Pod falla, el ReplicaSet del Deployment correspondiente detecta la pérdida y crea automáticamente un nuevo Pod, sin intervención manual, manteniendo la disponibilidad del servicio.
 
 ---
 
 ## Integración Continua y Despliegue Continuo (CI/CD)
 
-El proyecto implementa un pipeline automatizado utilizando GitHub Actions.
+Pipeline automatizado mediante GitHub Actions (`.github/workflows/deploy-eks.yml`).
 
-### Flujo CI/CD
+### Flujo del pipeline
 
-1. Se realiza un cambio en el código fuente.
-2. Se ejecuta un Push hacia la rama principal.
-3. GitHub Actions inicia automáticamente el pipeline.
-4. Se construyen las imágenes Docker.
-5. Las imágenes son publicadas en Amazon ECR.
-6. Kubernetes utiliza las nuevas imágenes almacenadas en ECR.
-7. Se ejecuta un rollout controlado de los Deployments.
-8. La nueva versión queda disponible para los usuarios.
+1. Push a la rama `main` (o ejecución manual vía `workflow_dispatch`).
+2. Checkout del código.
+3. Configuración de credenciales AWS (GitHub Secrets).
+4. Login a Amazon ECR.
+5. Generación del tag de imagen a partir del commit SHA.
+6. Build y push de las tres imágenes a ECR.
+7. Configuración de `kubectl` contra el clúster EKS.
+8. Aplicación de manifiestos base (namespace, Secret de la BD, Deployment/Service de MySQL).
+9. Actualización de los Deployments de backend y frontend (`apply` + `set image` + `rollout status`).
+10. Aplicación condicional de los manifiestos de HPA.
+11. Verificación final de Pods, Services y HPA.
 
 ### Evolución del Pipeline
 
-**EV2**
-
-```text
-GitHub → Docker Build → ECR → EC2
-```
-
-**EV3**
-
-```text
-GitHub → Docker Build → ECR → EKS → Kubernetes Rollout
-```
-
-Esto permite actualizar los Pods automáticamente sin intervención manual.
+**EV2:** `GitHub → Docker Build → ECR → EC2`
+**EV3/EFT:** `GitHub → Docker Build → ECR → EKS → Kubernetes Rollout`
 
 ---
 
 ## Principios DevOps Aplicados
 
 * Control de versiones mediante GitHub.
-* Contenedorización mediante Docker.
+* Contenedorización mediante Docker, con entorno local reproducible vía Docker Compose.
 * Infraestructura Cloud en AWS.
-* Integración Continua (CI).
-* Despliegue Continuo (CD).
+* Integración Continua (CI) y Despliegue Continuo (CD).
+* Gestión de secretos mediante GitHub Secrets y Kubernetes Secrets.
 * Observabilidad mediante CloudWatch.
-* Automatización mediante Kubernetes.
+* Automatización y autoescalado mediante Kubernetes.
 
 ---
 
 ## Monitoreo y Observabilidad
 
-Se utilizó Amazon CloudWatch para:
+Amazon CloudWatch se utiliza para:
 
-* Supervisar el estado del clúster.
-* Registrar eventos del plano de control.
+* Supervisar el estado del clúster y del plano de control.
+* Registrar eventos del plano de control (api, audit, scheduler, controllerManager).
 * Analizar métricas de CPU y memoria.
 * Revisar logs de Kubernetes.
-* Monitorear la salud general de la aplicación.
 
 ---
 
 ## Cómo Utilizar la Aplicación
 
-1. Acceder a la URL pública del frontend.
+1. Acceder a la URL pública del frontend (`kubectl get svc tienda-frontend -n tienda`).
 2. Visualizar los productos registrados.
 3. Crear nuevos productos mediante el formulario.
 4. Modificar productos existentes.
 5. Eliminar productos que ya no sean necesarios.
-
-Todos los cambios realizados son almacenados automáticamente en la base de datos MySQL.
 
 ---
 
 ## Estructura del Proyecto
 
 ```text
-frontend/
-├── index.html
-├── app.js
-├── Dockerfile
-└── default.conf
-
-backend/
-├── server.js
-├── package.json
-└── Dockerfile
-
-db/
-├── Dockerfile
-└── scripts SQL
-
-k8s/
-├── namespace.yaml
-├── mysql-deployment.yaml
-├── mysql-service.yaml
-├── backend-deployment.yaml
-├── backend-service.yaml
-├── frontend-deployment.yaml
-├── frontend-service.yaml
-├── backend-hpa.yaml
-└── frontend-hpa.yaml
-
-.github/
-└── workflows/
-    └── cicd-eks.yml
+tienda-perritos/
+├── docker-compose.yml
+├── frontend/
+│   ├── index.html
+│   ├── app.js
+│   ├── Dockerfile
+│   └── default.conf
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   └── Dockerfile
+├── db/
+│   ├── Dockerfile
+│   └── init.sql
+├── k8s/
+│   ├── namespace.yaml
+│   ├── mysql-secret.yaml
+│   ├── mysql-deployment.yaml
+│   ├── mysql-service.yaml
+│   ├── backend-deployment.yaml
+│   ├── backend-service.yaml
+│   ├── frontend-deployment.yaml
+│   ├── frontend-service.yaml
+│   ├── backend-hpa.yaml
+│   └── frontend-hpa.yaml
+└── .github/
+    └── workflows/
+        └── deploy-eks.yml
 ```
 
 ---
 
 ## Tecnologías Utilizadas
 
-* HTML
-* CSS
-* JavaScript
-* Node.js
-* Express
+* HTML, CSS, JavaScript
+* Node.js, Express
 * MySQL
-* Docker
+* Docker, Docker Compose
 * Kubernetes
-* Amazon EKS
-* Amazon ECR
-* AWS IAM
-* Amazon CloudWatch
+* Amazon EKS, ECR, VPC, IAM, CloudWatch
 * GitHub Actions
 
 ---
 
 ## Autor
 
-Proyecto desarrollado con fines académicos para aplicar conceptos de Cloud Computing, DevOps, Docker, Kubernetes y servicios de Amazon Web Services (AWS).
+Gabriel Andrés Águila Gormaz — Proyecto desarrollado con fines académicos para aplicar conceptos de Cloud Computing, DevOps, Docker, Kubernetes y servicios de Amazon Web Services (AWS).
