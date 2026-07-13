@@ -52,7 +52,7 @@ jobs:
           docker build -t $ECR_REGISTRY/${ECR_REPO_BACKEND}:${IMAGE_TAG} .
           docker push $ECR_REGISTRY/${ECR_REPO_BACKEND}:${IMAGE_TAG}
 
-      # ---------- DB (opcional) ----------
+      # ---------- DB ----------
       - name: Build & push DB
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -88,6 +88,17 @@ jobs:
           kubectl apply -f k8s/mysql-deployment.yaml -n $EKS_NAMESPACE
           kubectl apply -f k8s/mysql-service.yaml -n $EKS_NAMESPACE
 
+      # ---------- Actualizar DB en EKS ----------
+      - name: Actualizar DB en EKS
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
+        run: |
+          kubectl set image deployment/tienda-db \
+            mysql=$ECR_REGISTRY/${ECR_REPO_DB}:${IMAGE_TAG} \
+            -n $EKS_NAMESPACE
+          kubectl rollout status deployment/tienda-db -n $EKS_NAMESPACE
+
       # ---------- Actualizar BACKEND en EKS ----------
       - name: Actualizar BACKEND en EKS
         env:
@@ -114,7 +125,7 @@ jobs:
             -n $EKS_NAMESPACE
           kubectl rollout status deployment/tienda-frontend -n $EKS_NAMESPACE
 
-      # ---------- HPA (si existen los YAML) ----------
+      # ---------- HPA ----------
       - name: Aplicar HPA (opcional)
         env:
           EKS_NAMESPACE: ${{ secrets.EKS_NAMESPACE }}
